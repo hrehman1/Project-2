@@ -70,22 +70,37 @@ public class Project
 			}
 			catch (IOException e)
 			{
-				e.getMessage();
+				System.out.println(e.getMessage());
 			}
 			
 			//initialize trng arrays
-			for (int iterator1 = 0; iterator1 < 100; iterator1++)
+			if (trng != null)
 			{
-				trngOne[iterator1] = trng.nextInt();
-				trngTwo[iterator1] = trng.nextInt();
+				for (int iterator1 = 0; iterator1 < 100; iterator1++)
+				{
+					trngOne[iterator1] = trng.nextInt();
+					trngTwo[iterator1] = trng.nextInt();
+				}
 			}
+			
+			//initialize gcd counters
+			int prngGCD = 0, csprngGCD = 0, trngGCD = 0;
 			
 			//get primepairs
 			for (int iterator1 = 0; iterator1 < 100; iterator1++)
 			{
-				int prngGCD = euclideanAlg(prngOne[iterator1], prngTwo[iterator1]);
-				int csprngGCD = euclideanAlg(csprngOne[iterator1], csprngTwo[iterator1]);
-				int trngGCD = euclideanAlg(trngOne[iterator1], trngTwo[iterator1]);
+				if (prng != null)
+				{
+					prngGCD = euclideanAlg(prngOne[iterator1], prngTwo[iterator1]);
+				}
+				if (csprng != null)
+				{
+					csprngGCD = euclideanAlg(csprngOne[iterator1], csprngTwo[iterator1]);
+				}
+				if (trng != null)
+				{
+					trngGCD = euclideanAlg(trngOne[iterator1], trngTwo[iterator1]);
+				}
 				
 				if (prngGCD == 1) prngPrimePairs++;
 				if (csprngGCD == 1) csprngPrimePairs++;
@@ -104,8 +119,11 @@ public class Project
 		}
 		
 		//generate and print tables
+		System.out.println("PRNG Frequency Table");
 		generateTable(prngFrequencyGraph);
+		System.out.println("CSPRNG Frequency Table");
 		generateTable(csprngFrequencyGraph);
+		System.out.println("TRNG Frequency Table");
 		generateTable(trngFrequencyGraph);
 	}
 	
@@ -145,12 +163,78 @@ public class Project
 		double mean = sum / 30;
 		double standardDeviation = standardDeviation(frequencies, mean);
 		double classWidth = dataRange / 5;
+		double min = getMin(frequencies);
+		double max = getMax(frequencies);
+		double[] classBoundaries = getClassBoundaries(min, max, classWidth);
+		double[] classFrequencies = new double[5];
 		
-		System.out.println("dataRange = " + dataRange);
-		System.out.println("sum = " + sum);
+		//generate class frequencies
+		for (int frequencyIterator = 0; frequencyIterator < classFrequencies.length; frequencyIterator++)
+		{
+			classFrequencies[frequencyIterator] = getFrequency(classBoundaries[frequencyIterator], classBoundaries[frequencyIterator + 1], frequencies);
+		}
+		
+		//print mean and standard deviation for given dataset
 		System.out.println("mean = " + mean);
 		System.out.println("standardDeviation = " + standardDeviation);
-		System.out.println("classWidth = " + classWidth);
+		
+		//format and generate actual table
+		System.out.printf("%10s%20s\n", "Class Boundaries", "Frequency");
+		for (int iterator = 0; iterator < 5; iterator ++)
+		{
+			System.out.printf("%1.7f%s%1.7f%10.1f\n\n", classBoundaries[iterator], " - ", classBoundaries[iterator + 1], classFrequencies[iterator]);
+		}
+	}
+	
+	public static int getFrequency(double lowerClassBoundary, double upperClassBoundary, double[] frequencies)
+	{
+		//each index of array classFrequencies represents the frequency of data values in the given class
+		int frequency = 0;
+		
+		for (int iterator = 0; iterator < frequencies.length; iterator++)	//iterates through array of pi generations and checks if they fall under class boundaries or not
+		{
+			if (frequencies[iterator] > lowerClassBoundary - 0.0000005 && frequencies[iterator] < upperClassBoundary + 0.0000005) frequency++;
+		}
+		
+		return frequency;
+	}
+	
+	public static double[] getClassBoundaries(double min, double max, double classWidth)
+	{
+		double[] classBoundaries = new double[6];
+		double currentClassMin = min;
+		
+		for (int iterator = 0; iterator < classBoundaries.length; iterator++)
+		{
+			classBoundaries[iterator] = currentClassMin;
+			currentClassMin += classWidth;
+		}
+		
+		return classBoundaries;
+	}
+	
+	public static double getMin(double[] frequencies)
+	{
+		double min = 10;
+		
+		for (int iterator = 0; iterator < frequencies.length; iterator++)
+		{
+			if (frequencies[iterator] < min) min = frequencies[iterator];
+		}
+		
+		return min;
+	}
+	
+	public static double getMax(double[] frequencies)
+	{
+		double max = 0;
+		
+		for (int iterator = 0; iterator < frequencies.length; iterator++)
+		{
+			if (frequencies[iterator] > max) max = frequencies[iterator];
+		}
+		
+		return max;
 	}
 	
 	public static void sort(double[] frequencies)
