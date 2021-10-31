@@ -2,7 +2,7 @@
  * Main : Uses 3 diff rng methods and checks randomness based on Cesaro's theorem
  * 
  * @author Hudhaifah Rehman and Nicolas Swank
- * @version 10/21/2021
+ * @version 10/31/2021
  */
 
 import java.io.IOException;
@@ -55,8 +55,8 @@ public class Project
 			csprngStream = csprng.ints(100, 1, 101);
 			csprngTwo = csprngStream.toArray();
 			
-			//Initialize connection to random.org (inside loop to make sure new link is used every iteration)
-			try
+			//Initialize connection to random.org (inside loop to make sure new link is used every iteration)	if doesnt work try again later, stops working randomly for some reason
+			try	
 			{
 				String address = "https://www.random.org/integers/?num=200&min=1&max=100&col=2&base=10&format=plain&rnd=new";
 				URL url = new URL(address);	
@@ -127,6 +127,12 @@ public class Project
 		generateTable(trngFrequencyGraph);
 	}
 	
+	/** euclideanAlg(int, int) : compares 2 ints and returns the gcd
+	 * 
+	 * @param x : number 1 
+	 * @param y : number 2
+	 * @return gcd
+	 */
 	public static int euclideanAlg(int x, int y)
 	{
 		if (x < y)
@@ -148,11 +154,20 @@ public class Project
 		return y;
 	}
 	
+	/** estimatePi(double) : estimates pi based on number of prime num pairs and cesaros theorem
+	 * 
+	 * @param primeGCDCount : number of prime nums found in a set of 100 num pairs
+	 * @return pi estimate
+	 */
 	public static double estimatePi(double primeGCDCount)
 	{
 		return Math.sqrt(6 / (primeGCDCount / 100));
 	}
 	
+	/** generateTable(double[]) : generates dataset characteristics and uses them to format a frequency distribution table 
+	 * 
+	 * @param frequencies : array of pi estimates
+	 */
 	public static void generateTable(double[] frequencies)
 	{
 		sort(frequencies);	//sort for distribution class generation
@@ -186,6 +201,13 @@ public class Project
 		}
 	}
 	
+	/** getFrequency(double, double, double[]) : gets the frequency of data values that occur in a given class range
+	 * 
+	 * @param lowerClassBoundary : lower boundary of class 
+	 * @param upperClassBoundary : upper boundary of class 
+	 * @param frequencies : array of pi estimates
+	 * @return frequency of data values in class
+	 */
 	public static int getFrequency(double lowerClassBoundary, double upperClassBoundary, double[] frequencies)
 	{
 		//each index of array classFrequencies represents the frequency of data values in the given class
@@ -193,18 +215,25 @@ public class Project
 		
 		for (int iterator = 0; iterator < frequencies.length; iterator++)	//iterates through array of pi generations and checks if they fall under class boundaries or not
 		{
-			if (frequencies[iterator] > lowerClassBoundary - 0.0000005 && frequencies[iterator] < upperClassBoundary + 0.0000005) frequency++;
+			if (frequencies[iterator] > lowerClassBoundary - 0.0000005 && frequencies[iterator] < upperClassBoundary + 0.0000005) frequency++;	//adds/subtracts value to boundaries outside of decimal range to make sure everything is assigned where it belongs
 		}
 		
 		return frequency;
 	}
 	
+	/** getClassBoundaries(double, double, double) : generates class boundaries based on minimum and classwidth
+	 * 
+	 * @param min : minimum value of dataset
+	 * @param max : maximum value of dataset
+	 * @param classWidth : width of each class
+	 * @return array of all class boundaries
+	 */
 	public static double[] getClassBoundaries(double min, double max, double classWidth)
 	{
 		double[] classBoundaries = new double[6];
 		double currentClassMin = min;
 		
-		for (int iterator = 0; iterator < classBoundaries.length; iterator++)
+		for (int iterator = 0; iterator < classBoundaries.length; iterator++)	//generates class boundaries by adding classwidth to class min
 		{
 			classBoundaries[iterator] = currentClassMin;
 			currentClassMin += classWidth;
@@ -213,6 +242,11 @@ public class Project
 		return classBoundaries;
 	}
 	
+	/** getMin(double[]) : gets min value in array
+	 * 
+	 * @param frequencies : array of pi estimates
+	 * @return min value
+	 */
 	public static double getMin(double[] frequencies)
 	{
 		double min = 10;
@@ -225,6 +259,11 @@ public class Project
 		return min;
 	}
 	
+	/**	getMax(double[]) : get max value in an array
+	 * 
+	 * @param frequencies : array of pi estimates
+	 * @return max value
+	 */
 	public static double getMax(double[] frequencies)
 	{
 		double max = 0;
@@ -237,6 +276,10 @@ public class Project
 		return max;
 	}
 	
+	/** sort(double[]) : sorts elements of an array
+	 * 
+	 * @param frequencies : array of pi estimates
+	 */
 	public static void sort(double[] frequencies)
 	{
 		for (int iteratorI = 0; iteratorI < frequencies.length; iteratorI++)
@@ -253,6 +296,11 @@ public class Project
 		}
 	}
 	
+	/** sum(double[]) : sums all elements in array
+	 * 
+	 * @param frequencies : array of pi estimates
+	 * @return sum of all estimates
+	 */
 	public static double sum(double[] frequencies)
 	{
 		double sum = 0;
@@ -265,6 +313,12 @@ public class Project
 		return sum;
 	}
 	
+	/** standardDeviation(double[], double) : calculates the standard deviation of a dataset
+	 * 
+	 * @param frequencies : array of pi estimates
+	 * @param mean : average of all values in array
+	 * @return standard deviation of dataset
+	 */
 	public static double standardDeviation(double[] frequencies, double mean)
 	{
 		double standardDeviation = 0;
